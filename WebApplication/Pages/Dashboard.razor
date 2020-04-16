@@ -1,0 +1,143 @@
+﻿@page "/dashboard"
+
+@using WebApplication.Data
+@inject IDashboardService DashboardService
+
+<div>
+    <h1>Dashboard</h1>
+    <br/>
+</div>
+
+<div class="ui grid">
+    <div class="four wide column">
+        <div class="ui top attached olive segment">
+            To do
+        </div>
+        <div class="ui attached segment">
+            @foreach (var item in toDo)
+            {
+                <div class="ui segment">
+                    @item
+                    <span style="float: right;">
+                        <i class="green tasks icon" @onclick="(e => MoveTask(item, TaskType.ToDo))"></i>
+                        <i class="red trash alternate outline icon" @onclick="(e => DeleteTask(item, TaskType.ToDo))"></i>
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="four wide column">
+        <div class="ui top attached yellow segment">
+            In progress
+        </div>
+        <div class="ui attached segment">
+            @foreach (var item in inProgress)
+            {
+                <div class="ui segment">
+                    @item
+                    <span style="float: right;">
+                        <i class="green tasks icon" @onclick="(e => MoveTask(item, TaskType.InProgress))"></i>
+                        <i class="red trash alternate outline icon" @onclick="(e => DeleteTask(item, TaskType.InProgress))"></i>
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="four wide column">
+        <div class="ui top attached orange segment">
+            Test
+        </div>
+        <div class="ui attached segment">
+            @foreach (var item in test)
+            {
+                <div class="ui segment">
+                    @item
+                    <span style="float: right;">
+                        <i class="green tasks icon" @onclick="(e => MoveTask(item, TaskType.Test))"></i>
+                        <i class="red trash alternate outline icon" @onclick="(e => DeleteTask(item, TaskType.Test))"></i>
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="four wide column">
+        <div class="ui top attached green segment">
+            Done
+        </div>
+        <div class="ui attached segment">
+            @foreach (var item in done)
+            {
+                <div class="ui segment">
+                    @item
+                    <span style="float: right;">
+                        <i class="green tasks icon" @onclick="(e => MoveTask(item, TaskType.Done))"></i>
+                        <i class="red trash alternate outline icon" @onclick="(e => DeleteTask(item, TaskType.Done))"></i>
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private List<string> toDo;
+    private List<string> inProgress;
+    private List<string> test;
+    private List<string> done;
+
+    private void IncrementCount()
+    {
+        toDo.Add("5");
+    }
+
+    private void DeleteTask(string task, TaskType type)
+    {
+        switch (type)
+        {
+            case TaskType.ToDo:
+                toDo.Remove(task);
+                break;
+            case TaskType.InProgress:
+                inProgress.Remove(task);
+                break;
+            case TaskType.Test:
+                test.Remove(task);
+                break;
+            case TaskType.Done:
+                done.Remove(task);
+                break;
+        }
+    }
+
+    private void MoveTask(string task, TaskType type)
+    {
+        switch (type)
+        {
+            case TaskType.ToDo:
+                toDo.Remove(task);
+                inProgress.Add(task);
+                break;
+            case TaskType.InProgress:
+                inProgress.Remove(task);
+                test.Add(task);
+                break;
+            case TaskType.Test:
+                test.Remove(task);
+                done.Add(task);
+                break;
+            case TaskType.Done:
+                done.Remove(task);
+                break;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        toDo = await DashboardService.GetToDo();
+        inProgress = await DashboardService.GetInProgress();
+        test = await DashboardService.GetTest();
+        done = await DashboardService.GetDone();
+    }
+
+}
